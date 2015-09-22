@@ -1,16 +1,31 @@
 package me.jhoughton.myapplication;
 
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button button = (Button) this.findViewById(R.id.button1);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et = (EditText)findViewById(R.id.editText);
+                TextView tv = (TextView)findViewById(R.id.textView);
+                tv.setText(String.format("Hello %s", et.getText()));
+            }
+        });
     }
 
     @Override
@@ -33,5 +48,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onClick(View v) {
     }
 }
