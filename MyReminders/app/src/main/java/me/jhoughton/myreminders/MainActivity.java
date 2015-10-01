@@ -21,15 +21,29 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button button = (Button) findViewById(R.id.button);
+        Button clear = (Button) findViewById(R.id.buttonclear);
         final SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText et = (EditText) findViewById(R.id.editText);
+                String toAdd = et.getText().toString();
+                if(!toAdd.equals("")) {
+                    SharedPreferences.Editor editor = mSettings.edit();
+                    String update = mSettings.getString("tasks", "");
+                    update += update.equals("") ? "" : ", ";
+                    update += toAdd;
+                    editor.putString("tasks", update);
+                    editor.commit();
+                    updateTasks(mSettings);
+                }
+            }
+        });
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 SharedPreferences.Editor editor = mSettings.edit();
-                String update = mSettings.getString("tasks", "");
-                update += ", " + et.getText().toString();
-                editor.putString("tasks",update);
+                editor.putString("tasks",null);
                 editor.commit();
                 updateTasks(mSettings);
             }

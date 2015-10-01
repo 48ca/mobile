@@ -18,9 +18,18 @@
         android:layout_height="wrap_content"
         android:text="Save"
         android:id="@+id/button"
+        android:layout_marginStart="44dp"
         android:layout_below="@+id/editText"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="29dp" />
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear"
+        android:id="@+id/buttonclear"
+        android:layout_below="@+id/editText"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="60dp" />
 
     <TextView
         android:layout_width="wrap_content"
