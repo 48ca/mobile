@@ -16,17 +16,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        TextView textView = (TextView) findViewById(R.id.textView1);
+        textView.setOnClickListener(new View.OnClickListener() {
+            private int clicks = 0;
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Button Pressed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "TV1: " + ++clicks, Toast.LENGTH_SHORT).show();
+                Log.i("ToastLog", "Red: " + clicks);
             }
         });
-        TextView textView = (TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.textView2);
         textView.setOnClickListener(new View.OnClickListener() {
+            private int clicks = 0;
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "TextView Pressed", Toast.LENGTH_SHORT).show();
-                Log.i("onCreate", "TextViewPressed");
+                Toast.makeText(MainActivity.this, "TV2: " + ++clicks, Toast.LENGTH_SHORT).show();
+                Log.i("ToastLog", "Blue: " + clicks);
+            }
+        });
+        textView = (TextView) findViewById(R.id.textView3);
+        textView.setOnClickListener(new View.OnClickListener() {
+            private int clicks = 0;
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "TV3: " + ++clicks, Toast.LENGTH_SHORT).show();
+                Log.i("ToastLog", "Light Blue: " + clicks);
+            }
+        });
+        textView = (TextView) findViewById(R.id.textView4);
+        textView.setOnClickListener(new View.OnClickListener() {
+            private int clicks = 0;
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "TV4: " + ++clicks, Toast.LENGTH_SHORT).show();
+                Log.i("ToastLog", "Yellow: " + clicks);
             }
         });
     }

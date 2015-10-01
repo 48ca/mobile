@@ -2,5 +2,6 @@
     <string name="app_name">Day 3</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="tv"></string>
     <string name="action_settings">Settings</string>
 </resources>
