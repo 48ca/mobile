@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
                 EditText et = (EditText) findViewById(R.id.editText);
                 SharedPreferences.Editor editor = mSettings.edit();
                 String update = mSettings.getString("tasks", "");
-                update += et.getText().toString();
+                update += ", " + et.getText().toString();
                 editor.putString("tasks",update);
                 editor.commit();
                 updateTasks(mSettings);
