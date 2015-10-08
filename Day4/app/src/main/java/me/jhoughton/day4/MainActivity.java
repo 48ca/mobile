@@ -24,8 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
         TextView textView = (TextView) findViewById(R.id.textView1);
         textView.setOnClickListener(new View.OnClickListener() {
-            private int clicks = ms.getInt("red",0);
             public void onClick(View v) {
+                int clicks = ms.getInt("red",0);
                 Toast.makeText(MainActivity.this, "TV1: " + ++clicks, Toast.LENGTH_SHORT).show();
                 Log.i("ToastLog", "Red: " + clicks);
                 e.putInt("red", clicks);
@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
         });
         textView = (TextView) findViewById(R.id.textView2);
         textView.setOnClickListener(new View.OnClickListener() {
-            private int clicks = ms.getInt("blue",0);
             public void onClick(View v) {
+                int clicks = ms.getInt("blue",0);
                 Toast.makeText(MainActivity.this, "TV2: " + ++clicks, Toast.LENGTH_SHORT).show();
                 Log.i("ToastLog", "Blue: " + clicks);
                 e.putInt("blue", clicks);
@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
         });
         textView = (TextView) findViewById(R.id.textView3);
         textView.setOnClickListener(new View.OnClickListener() {
-            private int clicks = ms.getInt("lblue",0);
             public void onClick(View v) {
+                int clicks = ms.getInt("lblue",0);
                 Toast.makeText(MainActivity.this, "TV3: " + ++clicks, Toast.LENGTH_SHORT).show();
                 Log.i("ToastLog", "Light Blue: " + clicks);
                 e.putInt("lblue", clicks);
@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         });
         textView = (TextView) findViewById(R.id.textView4);
         textView.setOnClickListener(new View.OnClickListener() {
-            private int clicks = ms.getInt("yellow",0);
             public void onClick(View v) {
+                int clicks = ms.getInt("yellow",0);
                 Toast.makeText(MainActivity.this, "TV4: " + ++clicks, Toast.LENGTH_SHORT).show();
                 Log.i("ToastLog", "Yellow: " + clicks);
                 e.putInt("yellow", clicks);
