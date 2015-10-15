@@ -23,9 +23,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Firebase.setAndroidContext(this);
         final Firebase fb = new Firebase("https://day-5.firebaseio.com");
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.login_activity);
+        final Intent switchView = new Intent(this, MainActivity.class);
         Button login = (Button) findViewById(R.id.login);
-        Intent switchView = new Intent(this, MainActivity.class);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
                 fb.authWithPassword(username, password, new Firebase.AuthResultHandler() {
                     @Override
                     public void onAuthenticated(AuthData authData) {
+                        startActivity(switchView);
                         Toast.makeText(LoginActivity.this, "Logged in", Toast.LENGTH_LONG).show();
                     }
                     @Override
@@ -84,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.logout) {
             return true;
         }
 
