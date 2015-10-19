@@ -16,15 +16,18 @@ import com.firebase.client.FirebaseError;
 
 import java.util.Map;
 
+import static com.firebase.client.Firebase.setAndroidContext;
+
 public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Firebase.setAndroidContext(this);
+        setAndroidContext(this);
         final Firebase fb = new Firebase("https://day-5.firebaseio.com");
         setContentView(R.layout.login_activity);
-        final Intent switchView = new Intent(this, MainActivity.class);
+        final Intent switchView;
+        switchView = new Intent(this, ChatActivity.class);
         Button login = (Button) findViewById(R.id.login);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
