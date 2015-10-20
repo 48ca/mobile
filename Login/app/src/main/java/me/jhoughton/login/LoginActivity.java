@@ -14,7 +14,16 @@ import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+
+import java.io.IOException;
 import java.util.Map;
+
+import javax.net.ssl.SSLContext;
 
 import static com.firebase.client.Firebase.setAndroidContext;
 
@@ -27,20 +36,23 @@ public class LoginActivity extends AppCompatActivity {
         final Firebase fb = new Firebase("https://day-5.firebaseio.com");
         setContentView(R.layout.login_activity);
         final Intent switchView;
-        switchView = new Intent(this, ChatActivity.class);
+        switchView = new Intent(this, MainActivity.class);
         Button login = (Button) findViewById(R.id.login);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText utv = (EditText) findViewById(R.id.uname);
                 EditText ptv = (EditText) findViewById(R.id.passwd);
-                String username = utv.getText().toString();
-                String password = ptv.getText().toString();
+                final String username = utv.getText().toString();
+                final String password = ptv.getText().toString();
                 fb.authWithPassword(username, password, new Firebase.AuthResultHandler() {
                     @Override
                     public void onAuthenticated(AuthData authData) {
+
+                        switchView.putExtra("username",username);
+                        switchView.putExtra("password",password);
+
                         startActivity(switchView);
-                        Toast.makeText(LoginActivity.this, "Logged in", Toast.LENGTH_LONG).show();
                     }
                     @Override
                     public void onAuthenticationError(FirebaseError fbe) {
