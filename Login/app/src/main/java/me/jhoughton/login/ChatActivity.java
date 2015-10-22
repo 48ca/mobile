@@ -33,53 +33,30 @@ public class ChatActivity extends AppCompatActivity {
             assert ab != null;
             ab.setTitle(title);
         } catch(Exception e) {
-            Log.v("ERROR:",e.getMessage());
+            Log.v("ERROR:", e.getMessage());
         }
 
-        XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
-        //config.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
-        final String username = getIntent().getStringExtra("username");
-        final String password = getIntent().getStringExtra("password");
-        final String room = getIntent().getStringExtra("room");
-        config.setUsernameAndPassword(username, password);
-        config.setServiceName("jhoughton.me");
-        config.setHost("jhoughton.me");
-        config.setPort(5222);
-        config.setDebuggerEnabled(true);
+        String room = "chat";
 
-
-        XMPPTCPConnection mConnection = new XMPPTCPConnection(config.build());
-        mConnection.setPacketReplyTimeout(10000);
-
-        try {
-            mConnection.connect();
-            mConnection.login();
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        }
+        XMPPTCPConnection mConnection = MainActivity.parentActivity.getXMPPConnection();
 
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(mConnection);
         MultiUserChat muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
         try {
-            muc.join(username);
+            muc.join("test");
         } catch (XMPPException.XMPPErrorException e) {
             e.printStackTrace();
         } catch (SmackException e) {
             e.printStackTrace();
         }
 
-        Button send = (Button) findViewById(R.id.send);
-        EditText et = (EditText)(findViewById(R.id.message));
+        Button send = (Button) findViewById(R.id.btSend);
+        EditText et = (EditText)(findViewById(R.id.etMessage));
         final String message = et.getText().toString();
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextView tv = (TextView)findViewById(R.id.textView);
-                tv.setText(tv.getText()+"\n"+message);
+
             }
         });
         et.setText("");
