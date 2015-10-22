@@ -41,7 +41,7 @@ public class ChatActivity extends AppCompatActivity {
         XMPPTCPConnection mConnection = MainActivity.parentActivity.getXMPPConnection();
 
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(mConnection);
-        MultiUserChat muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
+        final MultiUserChat muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
         try {
             muc.join("test");
         } catch (XMPPException.XMPPErrorException e) {
@@ -51,12 +51,17 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         Button send = (Button) findViewById(R.id.btSend);
-        EditText et = (EditText)(findViewById(R.id.etMessage));
-        final String message = et.getText().toString();
+        final EditText et = (EditText)(findViewById(R.id.etMessage));
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String message = et.getText().toString();
+                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                try {
+                    muc.sendMessage(message);
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
             }
         });
         et.setText("");
