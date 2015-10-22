@@ -39,11 +39,12 @@ public class ChatActivity extends AppCompatActivity {
         String room = "chat";
 
         XMPPTCPConnection mConnection = MainActivity.parentActivity.getXMPPConnection();
+        String nick = MainActivity.parentActivity.getNick();
 
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(mConnection);
         final MultiUserChat muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
         try {
-            muc.join("test");
+            muc.join(nick);
         } catch (XMPPException.XMPPErrorException e) {
             e.printStackTrace();
         } catch (SmackException e) {
@@ -59,12 +60,13 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 try {
                     muc.sendMessage(message);
+                    et.setText("");
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
+                    Toast.make(getApplicationContext(), "Failed to send message!", Toast.TOAST_SHORT).show();
                 }
             }
         });
-        et.setText("");
     }
 
     @Override

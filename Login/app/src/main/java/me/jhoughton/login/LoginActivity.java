@@ -35,9 +35,14 @@ import static com.firebase.client.Firebase.setAndroidContext;
 public class LoginActivity extends AppCompatActivity {
 
     XMPPTCPConnection mConnection;
+    String nick;
 
     public synchronized XMPPTCPConnection getXMPPConnection() {
         return mConnection;
+    }
+
+    public static String getNick() {
+        return nick;
     }
 
     @Override
@@ -84,9 +89,11 @@ public class LoginActivity extends AppCompatActivity {
                  public void onClick(View v) {
                      XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
                      //config.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
-                     // final String username = getIntent().getStringExtra("username");
-                     // final String password = getIntent().getStringExtra("password");
-                     config.setUsernameAndPassword("test", "password");
+                     EditText utv = (EditText) findViewById(R.id.uname);
+                     EditText ptv = (EditText) findViewById(R.id.passwd);
+                     final String username = utv.getText().toString();
+                     final String password = ptv.getText().toString();
+                     config.setUsernameAndPassword(username, password);
                      config.setServiceName("jhoughton.me");
                      config.setHost("jhoughton.me");
                      config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
@@ -135,7 +142,9 @@ public class LoginActivity extends AppCompatActivity {
 
                      try {
                          mConnection.connect();
-                         mConnection.login("test", "password");
+                         mConnection.login(username, password);
+
+                         nick = username;
 
                          startActivity(switchView);
 
