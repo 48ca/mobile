@@ -11,26 +11,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.Manager;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.android.AndroidSmackInitializer;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smack.util.dns.HostAddress;
+import org.jivesoftware.smackx.iqregister.AccountManager;
 
 import java.io.IOException;
-import java.util.Map;
-
-import javax.net.ssl.SSLContext;
-
-import static com.firebase.client.Firebase.setAndroidContext;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -41,23 +32,22 @@ public class LoginActivity extends AppCompatActivity {
         return mConnection;
     }
 
-    public static String getNick() {
+    public String getNick() {
         return nick;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setAndroidContext(this);
-        final Firebase fb = new Firebase("https://day-5.firebaseio.com");
         setContentView(R.layout.login_activity);
+
+        MainActivity.parentActivity = this;
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         final Intent switchView;
         switchView = new Intent(this, MainActivity.class);
-        MainActivity.parentActivity = this;
         Button login = (Button) findViewById(R.id.login);
         /*
         login.setOnClickListener(new View.OnClickListener() {
@@ -83,33 +73,40 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
+
         */
+
+
+        final XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
+
+        config.setServiceName("jhoughton.me");
+        config.setHost("jhoughton.me");
+        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+        config.setDebuggerEnabled(true);
+
         login.setOnClickListener(new View.OnClickListener() {
                  @Override
                  public void onClick(View v) {
-                     XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
                      //config.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
                      EditText utv = (EditText) findViewById(R.id.uname);
                      EditText ptv = (EditText) findViewById(R.id.passwd);
-                     final String username = utv.getText().toString();
+                     String uget = utv.getText().toString();
                      final String password = ptv.getText().toString();
-                     config.setUsernameAndPassword(username, password);
-                     config.setServiceName("jhoughton.me");
-                     config.setHost("jhoughton.me");
-                     config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-                     config.setDebuggerEnabled(true);
+
+                     if(uget.equals("")) uget = "anonymous";
+                     final String username = uget;
 
                      mConnection = new XMPPTCPConnection(config.build());
 
                      mConnection.addConnectionListener(new ConnectionListener() {
                          @Override
                          public void connected(XMPPConnection connection) {
-                             Toast.makeText(getApplicationContext(), "Connected.", Toast.LENGTH_SHORT).show();
+                             // Toast.makeText(getApplicationContext(), "Connecting as " + username, Toast.LENGTH_SHORT).show();
                          }
 
                          @Override
                          public void authenticated(XMPPConnection connection, boolean resumed) {
-                             Toast.makeText(getApplicationContext(), "Authenticated.", Toast.LENGTH_SHORT).show();
+                             // Toast.makeText(getApplicationContext(), "Authenticated.", Toast.LENGTH_SHORT).show();
                          }
 
                          @Override
@@ -138,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
                          }
                      });
 
-                     mConnection.setPacketReplyTimeout(10000);
+                     mConnection.setPacketReplyTimeout(1000);
 
                      try {
                          mConnection.connect();
@@ -163,18 +160,22 @@ public class LoginActivity extends AppCompatActivity {
                 EditText ptv = (EditText) findViewById(R.id.passwd);
                 String username = utv.getText().toString();
                 String password = ptv.getText().toString();
-                fb.createUser(username, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
-                    @Override
-                    public void onSuccess(Map<String, Object> result) {
-                        Toast.makeText(LoginActivity.this, "Account created", Toast.LENGTH_LONG).show();
-                    }
 
-                    @Override
-                    public void onError(FirebaseError fbe) {
-                        Toast.makeText(LoginActivity.this, "Account creation failed", Toast.LENGTH_LONG).show();
-                    }
-                });
+                mConnection = new XMPPTCPConnection(config.build());
+                mConnection.setPacketReplyTimeout(1000);
+                try {
+                    mConnection.connect();
+                } catch (SmackException | IOException | XMPPException e) {
+                    e.printStackTrace();
+                }
 
+                AccountManager am = AccountManager.getInstance(mConnection);
+                try {
+                    am.createAccount(username,password);
+                    Toast.makeText(getApplicationContext(),"Created account successfully!",Toast.LENGTH_SHORT).show();
+                } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

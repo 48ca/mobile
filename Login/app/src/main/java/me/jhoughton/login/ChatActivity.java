@@ -1,14 +1,20 @@
 package me.jhoughton.login;
 
 import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Intent;
+import android.database.DataSetObserver;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,31 +29,33 @@ import java.io.IOException;
 
 public class ChatActivity extends AppCompatActivity {
 
+    XMPPTCPConnection mConnection;
+    MultiUserChatManager manager;
+    MultiUserChat muc;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        String title = getIntent().getStringExtra("itemValue");
+        String room = getIntent().getStringExtra("itemValue");
         ActionBar ab = getActionBar();
         try {
             assert ab != null;
-            ab.setTitle(title);
+            ab.setTitle(room);
         } catch(Exception e) {
             Log.v("ERROR:", e.getMessage());
         }
 
-        String room = "chat";
+        Toast.makeText(getApplicationContext(),room,Toast.LENGTH_LONG).show();
 
-        XMPPTCPConnection mConnection = MainActivity.parentActivity.getXMPPConnection();
+        mConnection = MainActivity.parentActivity.getXMPPConnection();
         String nick = MainActivity.parentActivity.getNick();
 
-        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(mConnection);
-        final MultiUserChat muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
+        manager = MultiUserChatManager.getInstanceFor(mConnection);
+        muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
         try {
             muc.join(nick);
-        } catch (XMPPException.XMPPErrorException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
+        } catch (XMPPException.XMPPErrorException | SmackException e) {
             e.printStackTrace();
         }
 
@@ -57,16 +65,25 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String message = et.getText().toString();
-                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 try {
                     muc.sendMessage(message);
+                    sendChatMessage(message);
                     et.setText("");
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
-                    Toast.make(getApplicationContext(), "Failed to send message!", Toast.TOAST_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Failed to send message!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        final ListView listView = (ListView) findViewById(R.id.listview);
+        ChatAdapter ca = new ChatAdapter();
+        listView.setAdapter(ca);
+    }
+
+    private boolean sendChatMessage(String message) {
+
+        return true;
     }
 
     @Override
@@ -89,5 +106,15 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        try {
+            muc.leave();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+        this.finish();
     }
 }

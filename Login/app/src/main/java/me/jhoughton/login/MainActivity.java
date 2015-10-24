@@ -52,12 +52,11 @@ public class MainActivity extends AppCompatActivity {
         final ListView listView = (ListView) findViewById(R.id.listview);
         assert rooms != null;
         String[] values;
-        Object[] roomArray = rooms.toArray();
-        int length = roomArray.length;
+        int length = rooms.size();
         values = new String[length];
         int cnt = 0;
-        for (Object o : roomArray) {
-            values[cnt++] = o.toString();
+        for (HostedRoom o : rooms) {
+            values[cnt++] = o.getName();
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.activity_listview, values);
         listView.setAdapter(adapter);
@@ -88,9 +87,16 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
+            parentActivity.getXMPPConnection().disconnect();
             finish();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        parentActivity.getXMPPConnection().disconnect();
+        this.finish();
     }
 }

@@ -20,8 +20,8 @@
         android:background="#ffffff"
         android:paddingTop="5dp"
         android:paddingBottom="10dp"
-        android:paddingLeft="0dp"
-        android:paddingRight="0dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:layout_height="wrap_content" >
         <EditText
             android:id="@+id/etMessage"
