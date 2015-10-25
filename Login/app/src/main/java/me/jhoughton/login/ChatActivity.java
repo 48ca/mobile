@@ -7,6 +7,7 @@ import android.database.DataSetObserver;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,12 +28,21 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class ChatActivity extends AppCompatActivity {
 
-    XMPPTCPConnection mConnection;
-    MultiUserChatManager manager;
-    MultiUserChat muc;
+    private XMPPTCPConnection mConnection;
+    private MultiUserChatManager manager;
+    private MultiUserChat muc;
+
+    private EditText messageET;
+    private ListView messagesContainer;
+    private Button sendBtn;
+    private ChatAdapter adapter;
+    private ArrayList<ChatMessage> chatHistory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,31 +70,32 @@ public class ChatActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Button send = (Button) findViewById(R.id.btSend);
-        final EditText et = (EditText)(findViewById(R.id.etMessage));
-        send.setOnClickListener(new View.OnClickListener() {
+        messagesContainer = (ListView)findViewById(R.id.messagesContainer);
+        chatHistory = new ArrayList<>();
+        adapter = new ChatAdapter(this,chatHistory);
+        sendBtn = (Button) findViewById(R.id.chatSendButton);
+        messageET = (EditText)(findViewById(R.id.messageEdit));
+        sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message = et.getText().toString();
+                String message = messageET.getText().toString();
                 try {
                     muc.sendMessage(message);
-                    sendChatMessage(message);
-                    et.setText("");
+
+
+                    ChatMessage chatMessage = new ChatMessage(message);
+                    chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+                    chatMessage.setMe(true);
+
+                    messageET.setText("");
+
+                    displayMessage(chatMessage);
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Failed to send message!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-        final ListView listView = (ListView) findViewById(R.id.listview);
-        ChatAdapter ca = new ChatAdapter();
-        listView.setAdapter(ca);
-    }
-
-    private boolean sendChatMessage(String message) {
-
-        return true;
     }
 
     @Override
@@ -116,5 +128,15 @@ public class ChatActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         this.finish();
+    }
+
+    public void displayMessage(ChatMessage message) {
+        adapter.add(message);
+        adapter.notifyDataSetChanged();
+        scroll();
+    }
+
+    private void scroll() {
+        messagesContainer.setSelection(messagesContainer.getCount() - 1);
     }
 }

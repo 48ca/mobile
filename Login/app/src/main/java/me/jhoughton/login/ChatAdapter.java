@@ -1,57 +1,93 @@
 package me.jhoughton.login;
 
-import android.widget.ArrayAdapter;
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by james on 10/23/2015.
  */
-public class ChatAdapter extends ArrayAdapter {
+public class ChatAdapter extends BaseAdapter {
 
-    private TextView chatText;
-    private List<ChatMessage> chatMessageList = new ArrayList<ChatMessage>();
-    private LinearLayout singleMessageContainer;
+    private final List<ChatMessage> chatMessages;
+    private Activity context;
 
-    public void add(ChatMessage object) {
-        chatMessageList.add(object);
-        super.add(object);
+    public ChatAdapter(Activity context, List<ChatMessage> chatMessages) {
+        this.context = context;
+        this.chatMessages = chatMessages;
     }
 
-    public ChatAdapter(Context context, int textViewResourceId) {
-        super(context, textViewResourceId);
-    }
-
+    @Override
     public int getCount() {
-        return this.chatMessageList.size();
-    }
-
-    public ChatMessage getItem(int index) {
-        return this.chatMessageList.get(index);
-    }
-
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        if (row == null) {
-            LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(R.layout.chat_item, parent, false);
+        if (chatMessages != null) {
+            return chatMessages.size();
+        } else {
+            return 0;
         }
-        singleMessageContainer = (LinearLayout) row.findViewById(R.id.singleMessageContainer);
-        ChatMessage chatMessageObj = getItem(position);
-        chatText = (TextView) row.findViewById(R.id.tvBody);
-        chatText.setText(chatMessageObj.message);
-        // chatText.setBackgroundResource(chatMessageObj.left ? R.drawable.bubble_a : R.drawable.bubble_b);
-        singleMessageContainer.setGravity(chatMessageObj.left ? Gravity.LEFT : Gravity.RIGHT);
-        return row;
+    }
+
+    @Override
+    public ChatMessage getItem(int position) {
+        if (chatMessages != null) {
+            return chatMessages.get(position);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
+        ChatMessage chatMessage = getItem(position);
+        LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        if (convertView == null) {
+            convertView = vi.inflate(R.layout.activity_chat, null);
+            holder = createViewHolder(convertView);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        boolean myMsg = chatMessage.getIsme() ;//Just a dummy check
+        //to simulate whether it me or other sender
+        holder.txtMessage.setText(chatMessage.getMessage());
+        holder.txtInfo.setText(chatMessage.getDate());
+
+        return convertView;
+    }
+
+    public void add(ChatMessage message) {
+        chatMessages.add(message);
+    }
+
+    private ViewHolder createViewHolder(View v) {
+        ViewHolder holder = new ViewHolder();
+        holder.txtMessage = (TextView) v.findViewById(R.id.txtMessage);
+        holder.content = (LinearLayout) v.findViewById(R.id.content);
+        holder.contentWithBG = (LinearLayout) v.findViewById(R.id.contentWithBackground);
+        holder.txtInfo = (TextView) v.findViewById(R.id.txtInfo);
+        return holder;
+    }
+
+    private static class ViewHolder {
+        public TextView txtMessage;
+        public TextView txtInfo;
+        public LinearLayout content;
+        public LinearLayout contentWithBG;
     }
 }
