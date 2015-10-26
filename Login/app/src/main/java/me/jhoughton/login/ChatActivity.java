@@ -2,21 +2,15 @@ package me.jhoughton.login;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
-import android.database.DataSetObserver;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,74 +22,67 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private XMPPTCPConnection mConnection;
     private MultiUserChatManager manager;
     private MultiUserChat muc;
-
-    private EditText messageET;
-    private ListView messagesContainer;
-    private Button sendBtn;
-    private ChatAdapter adapter;
-    private ArrayList<ChatMessage> chatHistory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        String room = getIntent().getStringExtra("itemValue");
+        String title = getIntent().getStringExtra("itemValue");
         ActionBar ab = getActionBar();
         try {
             assert ab != null;
-            ab.setTitle(room);
+            ab.setTitle(title);
         } catch(Exception e) {
             Log.v("ERROR:", e.getMessage());
         }
 
-        Toast.makeText(getApplicationContext(),room,Toast.LENGTH_LONG).show();
+        String room = title;
 
-        mConnection = MainActivity.parentActivity.getXMPPConnection();
-        String nick = MainActivity.parentActivity.getNick();
+        XMPPTCPConnection mConnection = MainActivity.parentActivity.getXMPPConnection();
+        final String nick = MainActivity.parentActivity.getNick();
 
         manager = MultiUserChatManager.getInstanceFor(mConnection);
         muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
         try {
             muc.join(nick);
-        } catch (XMPPException.XMPPErrorException | SmackException e) {
+        } catch (XMPPException.XMPPErrorException e) {
+            e.printStackTrace();
+        } catch (SmackException e) {
             e.printStackTrace();
         }
 
-        messagesContainer = (ListView)findViewById(R.id.messagesContainer);
-        chatHistory = new ArrayList<>();
-        adapter = new ChatAdapter(this,chatHistory);
-        sendBtn = (Button) findViewById(R.id.chatSendButton);
-        messageET = (EditText)(findViewById(R.id.messageEdit));
-        sendBtn.setOnClickListener(new View.OnClickListener() {
+        Button send = (Button) findViewById(R.id.chatSendButton);
+        final EditText et = (EditText)(findViewById(R.id.messageEdit));
+        send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message = messageET.getText().toString();
+                String message = et.getText().toString();
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                 try {
                     muc.sendMessage(message);
-
-
-                    ChatMessage chatMessage = new ChatMessage(message);
-                    chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-                    chatMessage.setMe(true);
-
-                    messageET.setText("");
-
-                    displayMessage(chatMessage);
+                    et.setText("");
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Failed to send message!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        List<ChatMessage> past = new ArrayList<ChatMessage>() {{
+            add(new ChatMessage("james","wasd"));
+        }};
+        ChatAdapter ca = new ChatAdapter(this, past) {{
+            add(new ChatMessage("james2","test2"));
+        }};
+        ListView list = (ListView) findViewById(R.id.messagesContainer);
+        list.setAdapter(ca);
+
     }
 
     @Override
@@ -128,15 +115,5 @@ public class ChatActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         this.finish();
-    }
-
-    public void displayMessage(ChatMessage message) {
-        adapter.add(message);
-        adapter.notifyDataSetChanged();
-        scroll();
-    }
-
-    private void scroll() {
-        messagesContainer.setSelection(messagesContainer.getCount() - 1);
     }
 }

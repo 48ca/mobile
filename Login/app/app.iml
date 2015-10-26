@@ -91,8 +91,8 @@
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="smack-extensions-4.1.1" level="project" />
-    <orderEntry type="library" exported="" name="smack-android-4.1.1" level="project" />
     <orderEntry type="library" exported="" name="jxmpp-util-cache-0.4.2-beta1" level="project" />
+    <orderEntry type="library" exported="" name="smack-android-4.1.1" level="project" />
     <orderEntry type="library" exported="" name="smack-im-4.1.1" level="project" />
     <orderEntry type="library" exported="" name="smack-core-4.1.1" level="project" />
     <orderEntry type="library" exported="" name="smack-sasl-provided-4.1.1" level="project" />

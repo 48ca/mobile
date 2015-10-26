@@ -9,10 +9,11 @@ public class ChatMessage {
     private long id;
     private boolean isMe;
     private String message;
-    private Long userId;
+    private String name;
     private String dateTime;
 
-    public ChatMessage(String message) {
+    public ChatMessage(String name, String message) {
+        this.name = name;
         this.message = message;
     }
     public long getId() {
@@ -33,6 +34,8 @@ public class ChatMessage {
     public void setMessage(String message) {
         this.message = message;
     }
+    public void setName(String name) {this.name = name;}
+    public String getName() {return this.name;}
     public String getDate() {
         return dateTime;
     }

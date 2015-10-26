@@ -17,7 +17,7 @@
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/chatSendButton"
             android:autoText="true"
-            android:hint="type message" />
+            android:hint="Send a message..." />
 
         <Button
             android:id="@+id/chatSendButton"
@@ -38,7 +38,12 @@
             android:layout_marginTop="10dp"
             android:listSelector="@android:color/transparent"
             android:transcriptMode="alwaysScroll"
-            android:divider="@null" />
-
+            android:divider="@null">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/label"
+                />
+        </ListView>
     </RelativeLayout>
 </LinearLayout>

@@ -57,17 +57,19 @@ public class ChatAdapter extends BaseAdapter {
 
         if (convertView == null) {
             convertView = vi.inflate(R.layout.activity_chat, null);
-            holder = createViewHolder(convertView);
-            convertView.setTag(holder);
+            // holder = createViewHolder(convertView);
+            // convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            // holder = (ViewHolder) convertView.getTag();
         }
 
         boolean myMsg = chatMessage.getIsme() ;//Just a dummy check
         //to simulate whether it me or other sender
-        holder.txtMessage.setText(chatMessage.getMessage());
-        holder.txtInfo.setText(chatMessage.getDate());
+        // holder.txtMessage.setText(chatMessage.getMessage());
+        // holder.txtInfo.setText(chatMessage.getDate());
 
+        TextView textView = (TextView) convertView.findViewById(R.id.label);
+        textView.setText(chatMessage.getMessage());
         return convertView;
     }
 
