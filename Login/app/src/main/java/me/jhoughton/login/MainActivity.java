@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setTitle("Chatrooms");
+
         XMPPTCPConnection mConnection = parentActivity.getXMPPConnection();
 
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(mConnection);
