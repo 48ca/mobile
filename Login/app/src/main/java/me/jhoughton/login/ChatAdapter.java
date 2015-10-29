@@ -2,13 +2,11 @@ package me.jhoughton.login;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -51,30 +49,40 @@ public class ChatAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        // ViewHolder holder;
         ChatMessage chatMessage = getItem(position);
         LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
-            convertView = vi.inflate(R.layout.activity_chat, null);
+            convertView = vi.inflate(R.layout.view_left, null);
             // holder = createViewHolder(convertView);
             // convertView.setTag(holder);
-        } else {
-            // holder = (ViewHolder) convertView.getTag();
-        }
+        } /* else {
+            holder = (ViewHolder) convertView.getTag();
+        } */
 
-        boolean myMsg = chatMessage.getIsme() ;//Just a dummy check
+        // View view;
+        // view = vi.inflate(R.layout.view_left,parent);
+
+        // boolean myMsg = chatMessage.getIsme() ;//Just a dummy check
         //to simulate whether it me or other sender
         // holder.txtMessage.setText(chatMessage.getMessage());
         // holder.txtInfo.setText(chatMessage.getDate());
 
-        TextView textView = (TextView) convertView.findViewById(R.id.label);
-        textView.setText(chatMessage.getMessage());
+        TextView textView = (TextView) convertView.findViewById(R.id.textView1);
+        textView.setText(chatMessage.getName() + ":  " + chatMessage.getMessage());
         return convertView;
     }
 
     public void add(ChatMessage message) {
         chatMessages.add(message);
+        // notifyDataSetChanged();
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
     }
 
     private ViewHolder createViewHolder(View v) {

@@ -2,22 +2,30 @@ package me.jhoughton.login;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.database.DataSetObserver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
@@ -29,6 +37,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private MultiUserChatManager manager;
     private MultiUserChat muc;
+    private ChatAdapter ca;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +67,16 @@ public class ChatActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        List<ChatMessage> past = new ArrayList<ChatMessage>();
+        ca = new ChatAdapter(this, past);
+
+        muc.addMessageListener(new MessageListener() {
+            @Override
+            public void processMessage(Message message) {
+                ca.add(new ChatMessage(message.getFrom().split("/")[1],message.getBody()));
+            }
+        });
+
         Button send = (Button) findViewById(R.id.chatSendButton);
         final EditText et = (EditText)(findViewById(R.id.messageEdit));
         send.setOnClickListener(new View.OnClickListener() {
@@ -68,18 +87,12 @@ public class ChatActivity extends AppCompatActivity {
                 try {
                     muc.sendMessage(message);
                     et.setText("");
+                    // ca.add(new ChatMessage(nick, message));
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        List<ChatMessage> past = new ArrayList<ChatMessage>() {{
-            add(new ChatMessage("james","wasd"));
-        }};
-        ChatAdapter ca = new ChatAdapter(this, past) {{
-            add(new ChatMessage("james2","test2"));
-        }};
         ListView list = (ListView) findViewById(R.id.messagesContainer);
         list.setAdapter(ca);
 
@@ -109,11 +122,13 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        /*
         try {
             muc.leave();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
+        */
         this.finish();
     }
 }
