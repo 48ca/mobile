@@ -48,12 +48,14 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         String title = getIntent().getStringExtra("itemValue");
         ActionBar ab = getActionBar();
+        /*
         try {
             assert ab != null;
             ab.setTitle(title);
         } catch(Exception e) {
             Log.v("ERROR:", e.getMessage());
         }
+        */
 
         String room = title;
 
