@@ -23,6 +23,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,9 +55,12 @@ public class MainActivity extends AppCompatActivity {
         String[] values;
         int length = rooms.size();
         values = new String[length];
+        final HashMap<String, String> jn = new HashMap<>();
         int cnt = 0;
         for (HostedRoom o : rooms) {
-            values[cnt++] = o.getName();
+            String name = o.getName();
+            values[cnt++] = name;
+            jn.put(name,o.getJid());
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.activity_listview, values);
         listView.setAdapter(adapter);
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String itemValue = (String) listView.getItemAtPosition(position);
-                i.putExtra("itemValue", itemValue);
+                i.putExtra("itemValue", jn.get(itemValue));
                 startActivity(i);
             }
         });

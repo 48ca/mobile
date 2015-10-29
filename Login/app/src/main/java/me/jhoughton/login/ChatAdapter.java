@@ -54,6 +54,9 @@ public class ChatAdapter extends BaseAdapter {
         LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
+            // if(chatMessage.getIsme())
+            //     convertView = vi.inflate(R.layout.view_right, null);
+            // else
             convertView = vi.inflate(R.layout.view_left, null);
             // holder = createViewHolder(convertView);
             // convertView.setTag(holder);
@@ -85,6 +88,7 @@ public class ChatAdapter extends BaseAdapter {
         });
     }
 
+    /*
     private ViewHolder createViewHolder(View v) {
         ViewHolder holder = new ViewHolder();
         holder.txtMessage = (TextView) v.findViewById(R.id.txtMessage);
@@ -100,4 +104,5 @@ public class ChatAdapter extends BaseAdapter {
         public LinearLayout content;
         public LinearLayout contentWithBG;
     }
+    */
 }

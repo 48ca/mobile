@@ -12,9 +12,10 @@ public class ChatMessage {
     private String name;
     private String dateTime;
 
-    public ChatMessage(String name, String message) {
+    public ChatMessage(String name, String message, String nick) {
         this.name = name;
         this.message = message;
+        this.isMe = name.equals(nick);
     }
     public long getId() {
         return id;

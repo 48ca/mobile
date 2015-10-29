@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat.Chat;
@@ -26,11 +27,13 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
@@ -58,9 +61,13 @@ public class ChatActivity extends AppCompatActivity {
         final String nick = MainActivity.parentActivity.getNick();
 
         manager = MultiUserChatManager.getInstanceFor(mConnection);
-        muc = manager.getMultiUserChat(room + "@conference.jhoughton.me");
+        muc = manager.getMultiUserChat(room);
+        DiscussionHistory history = new DiscussionHistory();
+        Date date = new Date();
+        date.setTime(date.getTime() - 1000 * 60  * 30);
+        history.setSince(date);
         try {
-            muc.join(nick);
+            muc.join(nick,null,history, SmackConfiguration.getDefaultPacketReplyTimeout());
         } catch (XMPPException.XMPPErrorException e) {
             e.printStackTrace();
         } catch (SmackException e) {
@@ -73,7 +80,7 @@ public class ChatActivity extends AppCompatActivity {
         muc.addMessageListener(new MessageListener() {
             @Override
             public void processMessage(Message message) {
-                ca.add(new ChatMessage(message.getFrom().split("/")[1],message.getBody()));
+                ca.add(new ChatMessage(message.getFrom().split("/")[1],message.getBody(),nick));
             }
         });
 
@@ -83,7 +90,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String message = et.getText().toString();
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                // Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                 try {
                     muc.sendMessage(message);
                     et.setText("");
