@@ -2,7 +2,9 @@ package me.jhoughton.login;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.database.DataSetObserver;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +50,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         String title = getIntent().getStringExtra("itemValue");
         ActionBar ab = getActionBar();
+        final Activity act = this;
         /*
         try {
             assert ab != null;
@@ -59,7 +62,7 @@ public class ChatActivity extends AppCompatActivity {
 
         String room = title;
 
-        XMPPTCPConnection mConnection = MainActivity.parentActivity.getXMPPConnection();
+        XMPPTCPConnection mConnection = JabberReceiveService.getXMPPConnection();
         final String nick = MainActivity.parentActivity.getNick();
 
         manager = MultiUserChatManager.getInstanceFor(mConnection);
@@ -82,7 +85,13 @@ public class ChatActivity extends AppCompatActivity {
         muc.addMessageListener(new MessageListener() {
             @Override
             public void processMessage(Message message) {
-                ca.add(new ChatMessage(message.getFrom().split("/")[1],message.getBody(),nick));
+                String uname = message.getFrom().split("/")[1];
+                ca.add(new ChatMessage(uname,message.getBody(),nick));
+
+                Intent mServiceIntent = new Intent(act, JabberReceiveService.class);
+                mServiceIntent.putExtra("user",uname);
+                mServiceIntent.putExtra("message", message.getBody());
+                startService(mServiceIntent);
             }
         });
 

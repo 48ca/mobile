@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -25,12 +26,7 @@ import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity {
 
-    XMPPTCPConnection mConnection;
     String nick;
-
-    public synchronized XMPPTCPConnection getXMPPConnection() {
-        return mConnection;
-    }
 
     public String getNick() {
         return nick;
@@ -96,8 +92,8 @@ public class LoginActivity extends AppCompatActivity {
                      if(uget.equals("")) uget = "anonymous";
                      final String username = uget;
 
-                     mConnection = new XMPPTCPConnection(config.build());
-
+                     XMPPTCPConnection mConnection = new XMPPTCPConnection(config.build());
+                     JabberReceiveService.setXMPPConnection(mConnection);
                      mConnection.addConnectionListener(new ConnectionListener() {
                          @Override
                          public void connected(XMPPConnection connection) {
@@ -161,7 +157,10 @@ public class LoginActivity extends AppCompatActivity {
                 String username = utv.getText().toString();
                 String password = ptv.getText().toString();
 
+
+                XMPPTCPConnection mConnection;
                 mConnection = new XMPPTCPConnection(config.build());
+                JabberReceiveService.setXMPPConnection(mConnection);
                 mConnection.setPacketReplyTimeout(1000);
                 try {
                     mConnection.connect();

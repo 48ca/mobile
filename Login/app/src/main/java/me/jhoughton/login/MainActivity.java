@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle("Chatrooms");
 
-        XMPPTCPConnection mConnection = parentActivity.getXMPPConnection();
+        XMPPTCPConnection mConnection = JabberReceiveService.getXMPPConnection();
 
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(mConnection);
         List<HostedRoom> rooms = null;
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
-            parentActivity.getXMPPConnection().disconnect();
+            JabberReceiveService.getXMPPConnection().disconnect();
             finish();
         }
 
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        parentActivity.getXMPPConnection().disconnect();
+        JabberReceiveService.getXMPPConnection().disconnect();
         this.finish();
     }
 }
