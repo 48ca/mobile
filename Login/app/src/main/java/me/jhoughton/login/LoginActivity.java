@@ -94,6 +94,7 @@ public class LoginActivity extends AppCompatActivity {
 
                      XMPPTCPConnection mConnection = new XMPPTCPConnection(config.build());
                      JabberReceiveService.setXMPPConnection(mConnection);
+                     JabberReceiveService.uname = username;
                      mConnection.addConnectionListener(new ConnectionListener() {
                          @Override
                          public void connected(XMPPConnection connection) {
@@ -161,6 +162,7 @@ public class LoginActivity extends AppCompatActivity {
                 XMPPTCPConnection mConnection;
                 mConnection = new XMPPTCPConnection(config.build());
                 JabberReceiveService.setXMPPConnection(mConnection);
+                JabberReceiveService.uname = username;
                 mConnection.setPacketReplyTimeout(1000);
                 try {
                     mConnection.connect();

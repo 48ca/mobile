@@ -26,6 +26,7 @@
         </activity>
         <activity
             android:name=".ChatActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_chat" >
         </activity>
         <service android:name=".JabberReceiveService"
