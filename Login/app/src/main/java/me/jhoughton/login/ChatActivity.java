@@ -61,39 +61,14 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         String title = getIntent().getStringExtra("itemValue");
-        ActionBar ab = getActionBar();
-        final Activity act = this;
-        JabberReceiveService.retAct = act;
-        /*
-        try {
-            assert ab != null;
-            ab.setTitle(title);
-        } catch(Exception e) {
-            Log.v("ERROR:", e.getMessage());
-        }
-        */
+        JabberReceiveService jrs = JabberReceiveService.instance;
 
         String room = title;
-
-        XMPPTCPConnection mConnection = JabberReceiveService.getXMPPConnection();
-        final String nick = MainActivity.parentActivity.getNick();
-
-        manager = MultiUserChatManager.getInstanceFor(mConnection);
-        muc = manager.getMultiUserChat(room);
-        DiscussionHistory history = new DiscussionHistory();
-        Date date = new Date();
-        date.setTime(date.getTime() - 1000 * 60  * 30);
-        history.setSince(date);
-        try {
-            muc.join(nick,null,history, SmackConfiguration.getDefaultPacketReplyTimeout());
-        } catch (XMPPException.XMPPErrorException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        }
-
+        final String nick = JabberReceiveService.uname;
+        muc = jrs.genMUC(room,nick,this);
         List<ChatMessage> past = new ArrayList<ChatMessage>();
         ca = new ChatAdapter(this, past);
+        jrs.chatAdapter = ca;
 
         Button send = (Button) findViewById(R.id.chatSendButton);
         final EditText et = (EditText)(findViewById(R.id.messageEdit));
@@ -113,20 +88,6 @@ public class ChatActivity extends AppCompatActivity {
         });
         ListView list = (ListView) findViewById(R.id.messagesContainer);
         list.setAdapter(ca);
-
-        muc.addMessageListener(new MessageListener() {
-            @Override
-            public void processMessage(Message message) {
-                String uname = message.getFrom().split("/")[1];
-                ca.add(new ChatMessage(uname, message.getBody(), nick));
-                if (!uname.equals(JabberReceiveService.uname) && !active) {
-                    Intent mServiceIntent = new Intent(act, JabberReceiveService.class);
-                    mServiceIntent.putExtra("user", uname);
-                    mServiceIntent.putExtra("message", message.getBody());
-                    startService(mServiceIntent);
-                }
-            }
-        });
     }
 
     @Override
@@ -153,12 +114,14 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        /*
         try {
             muc.leave();
             Toast.makeText(getApplicationContext(),"Left chatroom",Toast.LENGTH_SHORT).show();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
+        */
         this.finish();
     }
 }

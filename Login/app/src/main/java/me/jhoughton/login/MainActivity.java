@@ -34,11 +34,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        JabberReceiveService.context = getApplicationContext();
         setTitle("Chatrooms");
 
         XMPPTCPConnection mConnection = JabberReceiveService.getXMPPConnection();
-
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(mConnection);
         List<HostedRoom> rooms = null;
         try {
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        JabberReceiveService.getXMPPConnection().disconnect();
+        // JabberReceiveService.getXMPPConnection().disconnect();
         this.finish();
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     public String getNick() {
         return nick;
     }
+    public static JabberReceiveService jrs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,13 @@ public class LoginActivity extends AppCompatActivity {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        /*
+        if(JabberReceiveService.instance == null) {
+            Toast.makeText(getApplicationContext(),"JRS NULL!",Toast.LENGTH_SHORT).show();
+            new JabberBroadcastReceiver().onStartCommand();
+        }
+        */
 
         final Intent switchView;
         switchView = new Intent(this, MainActivity.class);
@@ -72,9 +81,9 @@ public class LoginActivity extends AppCompatActivity {
 
         */
 
+        startService(new Intent(getApplicationContext(), JabberReceiveService.class));
 
         final XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
-
         config.setServiceName("jhoughton.me");
         config.setHost("jhoughton.me");
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
@@ -91,60 +100,13 @@ public class LoginActivity extends AppCompatActivity {
 
                      if(uget.equals("")) uget = "anonymous";
                      final String username = uget;
-
-                     XMPPTCPConnection mConnection = new XMPPTCPConnection(config.build());
-                     JabberReceiveService.setXMPPConnection(mConnection);
-                     JabberReceiveService.uname = username;
-                     mConnection.addConnectionListener(new ConnectionListener() {
-                         @Override
-                         public void connected(XMPPConnection connection) {
-                             // Toast.makeText(getApplicationContext(), "Connecting as " + username, Toast.LENGTH_SHORT).show();
+                     if(JabberReceiveService.instance == null) {
+                         Toast.makeText(getApplicationContext(),"Jabber service is still starting...",Toast.LENGTH_SHORT).show();
+                     } else {
+                         JabberReceiveService.instance.start(config, username, password);
+                         if (JabberReceiveService.connected) {
+                             startActivity(switchView);
                          }
-
-                         @Override
-                         public void authenticated(XMPPConnection connection, boolean resumed) {
-                             // Toast.makeText(getApplicationContext(), "Authenticated.", Toast.LENGTH_SHORT).show();
-                         }
-
-                         @Override
-                         public void connectionClosed() {
-                             Toast.makeText(getApplicationContext(), "Connection closed.", Toast.LENGTH_SHORT).show();
-                         }
-
-                         @Override
-                         public void connectionClosedOnError(Exception e) {
-                             Toast.makeText(getApplicationContext(), "Connection closed.", Toast.LENGTH_SHORT).show();
-                         }
-
-                         @Override
-                         public void reconnectionSuccessful() {
-
-                         }
-
-                         @Override
-                         public void reconnectingIn(int seconds) {
-
-                         }
-
-                         @Override
-                         public void reconnectionFailed(Exception e) {
-
-                         }
-                     });
-
-                     mConnection.setPacketReplyTimeout(1000);
-
-                     try {
-                         mConnection.connect();
-                         mConnection.login(username, password);
-
-                         nick = username;
-
-                         startActivity(switchView);
-
-                     } catch (XMPPException | IOException | SmackException e) {
-                         e.printStackTrace();
-                         Toast.makeText(getApplicationContext(), "Failed to connect", Toast.LENGTH_LONG).show();
                      }
                  }
              }
@@ -158,11 +120,8 @@ public class LoginActivity extends AppCompatActivity {
                 String username = utv.getText().toString();
                 String password = ptv.getText().toString();
 
-
-                XMPPTCPConnection mConnection;
-                mConnection = new XMPPTCPConnection(config.build());
-                JabberReceiveService.setXMPPConnection(mConnection);
-                JabberReceiveService.uname = username;
+                JabberReceiveService.build(config.build());
+                XMPPTCPConnection mConnection = JabberReceiveService.getXMPPConnection();
                 mConnection.setPacketReplyTimeout(1000);
                 try {
                     mConnection.connect();
@@ -180,7 +139,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
