@@ -12,5 +12,7 @@ import android.content.Intent;
 public class JabberBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        Intent i = new Intent(context, JabberReceiveService.class);
+        context.startService(i);
     }
 }
