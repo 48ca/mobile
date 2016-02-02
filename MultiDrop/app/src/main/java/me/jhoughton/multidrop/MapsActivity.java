@@ -84,9 +84,10 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        getIntent().getStringArrayListExtra("locations");
         // zoomOnCoords() to zoom
         // final GestureDetector.SimpleOnGestureListener gestureDetector = new MapsGestureListener(this);
-        final RelativeLayout rl = (RelativeLayout) findViewById(R.id.bottomPane);
+        /*
         rl.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -98,6 +99,7 @@ public class MapsActivity extends FragmentActivity {
                 return false;
             }
         });
+        */
     }
 
     public void bringDownPane(View v, int height) {
@@ -147,11 +149,21 @@ public class MapsActivity extends FragmentActivity {
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
+            final double[] locationArray = {location.getLatitude(),location.getLongitude()};
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
             // Toast.makeText(getApplicationContext(), "Changed " + location.getLatitude() + " : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
             if(currentLoc == null) {
                 if (mMap != null) {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+                    final RelativeLayout rl = (RelativeLayout) findViewById(R.id.bottomPane);
+                    rl.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent i = new Intent(getApplicationContext(), DirectionsActivity.class);
+                            i.putExtra("location", locationArray);
+                            startActivity(i);
+                        }
+                    });
                 }
             }
             currentLoc = loc;

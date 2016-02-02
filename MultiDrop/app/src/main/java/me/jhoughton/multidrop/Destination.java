@@ -11,7 +11,11 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class Destination extends Location {
     public int time = 0;
-
+    public String name = "";
+    public Destination(String s) {
+        super(LocationManager.PASSIVE_PROVIDER);
+        name = s;
+    }
     public Destination(int lat, int lon) {
         super(LocationManager.PASSIVE_PROVIDER);
         this.setLatitude(lat);
