@@ -85,10 +85,12 @@ public class MapsActivity extends FragmentActivity {
     LatLng currentLoc;
     boolean transitionUp = true;
     PolylineOptions poly;
+    public boolean justStarted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        justStarted = getIntent().getBooleanExtra("js",true);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         ArrayList<String> locations = getIntent().getStringArrayListExtra("locations");
@@ -212,15 +214,25 @@ public class MapsActivity extends FragmentActivity {
             if(currentLoc == null) {
                 if (mMap != null) {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
-                    final RelativeLayout rl = (RelativeLayout) findViewById(R.id.bottomPane);
-                    rl.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent i = new Intent(getApplicationContext(), DirectionsActivity.class);
-                            i.putExtra("location", locationArray);
-                            startActivity(i);
-                        }
-                    });
+                    if(justStarted) {
+                        final RelativeLayout rl = (RelativeLayout) findViewById(R.id.bottomPane);
+                        rl.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent(getApplicationContext(), DirectionsActivity.class);
+                                i.putExtra("location", locationArray);
+                                startActivity(i);
+                            }
+                        });
+                    } else {
+                        final RelativeLayout rl = (RelativeLayout) findViewById(R.id.bottomPane);
+                        rl.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                finish();
+                            }
+                        });
+                    }
                 }
             }
             currentLoc = loc;

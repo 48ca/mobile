@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,29 +25,44 @@ public class DirectionsActivity extends AppCompatActivity {
         route.context = getApplicationContext();
         // route.addLatLng(loc[0],loc[1]);
         final TextView directionsText = (TextView) findViewById(R.id.directionsText);
+        final DirectionsAdapter adapter = new DirectionsAdapter(this, route.list);
         final Button add = (Button) findViewById(R.id.addButton);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                route.addString(directionsText.getText().toString());
+                adapter.add(directionsText.getText().toString());
                 directionsText.setText("");
+            }
+        });
+        final Button order = (Button) findViewById(R.id.order);
+        order.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"Ordering...",Toast.LENGTH_SHORT).show();
+                route.list = adapter.destinations;
+                if(route.bestPath(loc[0] + "," + loc[1])) {
+                    adapter.destinations = new ArrayList<>();
+                    for(String n : route.namesOrdered) {
+                        adapter.add(n);
+                    }
+                    adapter.notifyDataSetChanged();
+                }
             }
         });
         final Button done = (Button) findViewById(R.id.doneButton);
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),route.toString(),Toast.LENGTH_LONG).show();
-                ArrayList<String> ordered = route.bestPath(loc[0] + "," + loc[1]);
-                if(ordered != null) {
-                    Toast.makeText(getApplicationContext(),ordered.toString(),Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(getApplicationContext(), MapsActivity.class);
-                    i.putExtra("locations",ordered);
-                    i.putExtra("polyline",route.polyline);
-                    startActivity(i);
-                }
+                Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+                i.putExtra("locations",route.ordered);
+                i.putExtra("polyline", route.polyline);
+                i.putExtra("js",false);
+                startActivity(i);
             }
         });
+        // ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.activity_listview,route.list);
+        final ListView listView = (ListView) findViewById(R.id.directionsList);
+        listView.setAdapter(adapter);
     }
 
     @Override

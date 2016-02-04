@@ -18,7 +18,9 @@ import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ public class Route {
     ArrayList<String> list;
     public Context context;
     public String polyline;
+    public ArrayList<String> namesOrdered;
+    public ArrayList<String> ordered;
 
     public Route() {
         list = new ArrayList<>();
@@ -45,12 +49,17 @@ public class Route {
         list.add(str);
     }
 
-    ArrayList<String> bestPath(String orig) {
+    boolean bestPath(String orig) {
         if(list == null) {
         } else {
             String routeString = "";
-            for(String d : list) {
-                routeString+="|"+d.toString();
+            try {
+                for (String d : list) {
+                    routeString += "|" + URLEncoder.encode(d, "utf-8");
+                }
+            }
+            catch(Exception e) {
+                return false;
             }
             /*
             String urlString = Uri.parse("https:/maps.googleapis.com/maps/api/directions/json")
@@ -72,7 +81,7 @@ public class Route {
                 InetAddress i = InetAddress.getByName("maps.googleapis.com");
             } catch (UnknownHostException e1) {
                 e1.printStackTrace();
-                return null;
+                return false;
             }
             try {
                 url = new URL(urlString);
@@ -113,24 +122,25 @@ public class Route {
                     locations.add(legs.getJSONObject(i).getJSONObject("start_location"));
                 }
                 Toast.makeText(context,waypointOrder.toString(),Toast.LENGTH_LONG).show();
-                /*
-                ArrayList<String> ordered = new ArrayList<>();
+
+                namesOrdered = new ArrayList<>();
                 for(int i=0;i<list.size();i++) {
-                    ordered.add(list.get(waypointOrder.getInt(i)));
+                    namesOrdered.add(list.get(waypointOrder.getInt(i)));
                 }
-                */
-                ArrayList<String> ordered = new ArrayList<>();
+
+                ordered = new ArrayList<>();
                 for(JSONObject l : locations) {
                     ordered.add(l.getDouble("lat") + "," + l.getDouble("lng"));
                 }
                 polyline = object.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
-                return ordered;
+                return ordered != null;
             }
             catch(Exception e) {
-                Toast.makeText(context.getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                // Toast.makeText(context.getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Check destinations and internet connection!", Toast.LENGTH_LONG).show();
             }
-            return null;
+            return false;
         }
-        return null;
+        return false;
     }
 }
