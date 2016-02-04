@@ -20,6 +20,7 @@ public class DirectionsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_directions);
         final double[] loc = getIntent().getDoubleArrayExtra("location");
         final Route route = new Route();
+        route.context = getApplicationContext();
         // route.addLatLng(loc[0],loc[1]);
         final TextView directionsText = (TextView) findViewById(R.id.directionsText);
         final Button add = (Button) findViewById(R.id.addButton);
@@ -36,10 +37,13 @@ public class DirectionsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(),route.toString(),Toast.LENGTH_LONG).show();
                 ArrayList<String> ordered = route.bestPath(loc[0] + "," + loc[1]);
-                Toast.makeText(getApplicationContext(),ordered.toString(),Toast.LENGTH_LONG).show();
-
-                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
-                startActivity(i);
+                if(ordered != null) {
+                    Toast.makeText(getApplicationContext(),ordered.toString(),Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+                    i.putExtra("locations",ordered);
+                    i.putExtra("polyline",route.polyline);
+                    startActivity(i);
+                }
             }
         });
     }

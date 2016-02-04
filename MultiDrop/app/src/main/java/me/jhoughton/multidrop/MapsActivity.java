@@ -4,9 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -27,8 +30,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.internal.IPolylineDelegate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 class MapsGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -73,18 +80,35 @@ class MapsGestureListener extends GestureDetector.SimpleOnGestureListener {
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    final static String INTENT_KEY = "locations";
     private LocationManager locMgr;
     static int GPS_ALLOWED = 0;
     LatLng currentLoc;
     boolean transitionUp = true;
+    PolylineOptions poly;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-        getIntent().getStringArrayListExtra("locations");
+        ArrayList<String> locations = getIntent().getStringArrayListExtra("locations");
+        if(locations == null) return;
+        for(int i=1;i<locations.size();i++) {
+            String l = locations.get(i);
+            double lat = Double.parseDouble(l.substring(0,l.indexOf(',')));
+            double lon = Double.parseDouble(l.substring(l.indexOf(',') + 1));
+            Toast.makeText(getApplicationContext(),l,Toast.LENGTH_SHORT).show();
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)));
+        }
+        if(getIntent().getStringExtra("polyline") == null) return;
+        poly = new PolylineOptions();
+        for(LatLng l : decodePoly(getIntent().getStringExtra("polyline"))) {
+            Log.d("UGH","LAT: " + l.latitude + " LON: " + l.longitude);
+            poly.add(l);
+        }
+        poly.width(5).color(Color.RED);
+        Toast.makeText(getApplicationContext(), poly.toString(), Toast.LENGTH_LONG).show();
+        mMap.addPolyline(poly);
         // zoomOnCoords() to zoom
         // final GestureDetector.SimpleOnGestureListener gestureDetector = new MapsGestureListener(this);
         /*
@@ -100,6 +124,39 @@ public class MapsActivity extends FragmentActivity {
             }
         });
         */
+    }
+
+    private ArrayList<LatLng> decodePoly(String encoded) {
+
+        ArrayList<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng((((double) lat / 1E5)),
+                    (((double) lng / 1E5)));
+            poly.add(p);
+        }
+        return poly;
     }
 
     public void bringDownPane(View v, int height) {
@@ -190,7 +247,7 @@ public class MapsActivity extends FragmentActivity {
 
     private void zoomOnCoords() {
         Intent i = getIntent();
-        ArrayList<CharSequence> al = i.getCharSequenceArrayListExtra(INTENT_KEY);
+        ArrayList<CharSequence> al = i.getCharSequenceArrayListExtra("locations");
         double lat, lon;
         int in;
         String str;
@@ -217,7 +274,7 @@ public class MapsActivity extends FragmentActivity {
         }
         @Override
         public void onStatusChanged(String provider, int status, Bundle bundle) {
-            Toast.makeText(getApplicationContext(),"status changed",Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getApplicationContext(),"status changed",Toast.LENGTH_SHORT).show();
         }
         @Override
         public void onProviderDisabled(String provider) {

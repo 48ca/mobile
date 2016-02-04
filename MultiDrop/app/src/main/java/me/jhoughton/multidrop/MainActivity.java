@@ -19,16 +19,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Button b = (Button) findViewById(R.id.button);
         final Context c = getApplicationContext();
+        /*
         final Destination d1 = new Destination(30,30);
         final Destination d2 = new Destination(-30,-30);
+        */
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(c,MapsActivity.class);
-                i.putCharSequenceArrayListExtra(MapsActivity.INTENT_KEY,new ArrayList<CharSequence>(){{
-                    add(d1.latLongString());
-                    add(d2.latLongString());
-                }});
                 startActivity(i);
             }
         });
