@@ -211,6 +211,8 @@ public class MapsActivity extends FragmentActivity {
             final double[] locationArray = {location.getLatitude(),location.getLongitude()};
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
             // Toast.makeText(getApplicationContext(), "Changed " + location.getLatitude() + " : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+            final Intent i = new Intent(getApplicationContext(), DirectionsActivity.class);
+            i.putExtra("location", locationArray);
             if(currentLoc == null) {
                 if (mMap != null) {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
@@ -219,8 +221,6 @@ public class MapsActivity extends FragmentActivity {
                         rl.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent i = new Intent(getApplicationContext(), DirectionsActivity.class);
-                                i.putExtra("location", locationArray);
                                 startActivity(i);
                             }
                         });

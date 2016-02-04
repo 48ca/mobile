@@ -49,15 +49,22 @@ public class DirectionsActivity extends AppCompatActivity {
                 }
             }
         });
-        final Button done = (Button) findViewById(R.id.doneButton);
-        done.setOnClickListener(new View.OnClickListener() {
+        final Button plot = (Button) findViewById(R.id.plotButton);
+        plot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), MapsActivity.class);
                 i.putExtra("locations",route.ordered);
                 i.putExtra("polyline", route.polyline);
-                i.putExtra("js",false);
+                i.putExtra("js", false);
                 startActivity(i);
+            }
+        });
+        final Button done = (Button) findViewById(R.id.doneButton);
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
         // ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.activity_listview,route.list);
