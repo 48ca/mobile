@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="me.jhoughton.multidrop.MapsActivity">
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    <fragment
+        android:layout_width="match_parent"
         android:layout_height="match_parent" android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_above="@+id/bottomPane" />
@@ -20,23 +20,23 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="Directions"
+            android:text="@string/dest"
             android:textColor="#ffffff"
             android:textSize="30dp"
             android:id="@+id/directions"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
         />
-        <RelativeLayout
+        <!--RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="#00aaaa"
             android:id="@+id/directionsView"
             android:layout_below="@+id/directions"
             tools:context="me.jhoughton.multidrop.DirectionsActivity">
-            <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+            <TextView android:text="@string/dest" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-        </RelativeLayout>
+        </RelativeLayout-->
     </RelativeLayout>
 
 </RelativeLayout>

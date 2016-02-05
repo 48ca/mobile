@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -50,9 +52,10 @@ public class DirectionsAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // ViewHolder holder;
-        final String destination = getItem(position);
+        final String destination = destinations.get(position);
         LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final DirectionsAdapter adapter = this;
+        // Toast.makeText(context,"Getting: " + destination,Toast.LENGTH_SHORT).show();
         if (convertView == null) {
             // if(destination.getIsme())
             //     convertView = vi.inflate(R.layout.view_right, null);
@@ -60,18 +63,22 @@ public class DirectionsAdapter extends BaseAdapter {
             convertView = vi.inflate(R.layout.directions_item, null);
             // holder = createViewHolder(convertView);
             // convertView.setTag(holder);
-            ImageButton b = (ImageButton) convertView.findViewById(R.id.imageButton);
-            b.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    destinations.remove(destination);
-                    adapter.notifyDataSetChanged();
-                }
-            });
         }
-
-        TextView textView = (TextView) convertView.findViewById(R.id.textView1);
+        final TextView textView = (TextView) convertView.findViewById(R.id.textView1);
         textView.setText(destination);
+        ImageButton b = (ImageButton) convertView.findViewById(R.id.imageButton);
+        b.setOnClickListener(new View.OnClickListener() {
+            private String dest = "" + destination;
+
+            @Override
+            public void onClick(View v) {
+                destinations.remove(dest);
+                // Toast.makeText(context, dest, Toast.LENGTH_LONG).show();
+                adapter.notifyDataSetChanged();
+                final Button plot = (Button) context.findViewById(R.id.plotButton);
+                plot.setEnabled(false);
+            }
+        });
         return convertView;
     }
 

@@ -37,30 +37,24 @@ public class Route {
     public String polyline;
     public ArrayList<String> namesOrdered;
     public ArrayList<String> ordered;
+    public String bounds;
 
     public Route() {
         list = new ArrayList<>();
-    }
-
-    void addLatLng(double lat, double lon) {
-        list.add(lat + "," + lon);
-    }
-    void addString(String str) {
-        list.add(str);
     }
 
     boolean bestPath(String orig) {
         if(list == null) {
         } else {
             String routeString = "";
-            try {
-                for (String d : list) {
-                    routeString += "|" + URLEncoder.encode(d, "utf-8");
+                try {
+                    for (String d : list) {
+                        routeString += "|" + URLEncoder.encode(d, "utf-8");
+                    }
                 }
-            }
-            catch(Exception e) {
-                return false;
-            }
+                catch(Exception e) {
+                    return false;
+                }
             /*
             String urlString = Uri.parse("https:/maps.googleapis.com/maps/api/directions/json")
                     .buildUpon()
@@ -70,49 +64,49 @@ public class Route {
                     .appendQueryParameter("destination",orig)
                     .build().toString();
             */
-            String urlString = "https://maps.googleapis.com/maps/api/directions/json?waypoints=optimize:true" + routeString + "&key=AIzaSyBXFjiBzV08gMKJ7ZfNcF5es-CgoAu7slQ&origin=" + orig + "&destination=" + orig;
-            HttpURLConnection urlConnection = null;
-            URL url = null;
-            JSONObject object = null;
-            InputStream inStream = null;
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            try {
-                InetAddress i = InetAddress.getByName("maps.googleapis.com");
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
-                return false;
-            }
-            try {
-                url = new URL(urlString);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setDoOutput(true);
-                urlConnection.setDoInput(true);
-                urlConnection.connect();
-                inStream = urlConnection.getInputStream();
-                BufferedReader bReader = new BufferedReader(new InputStreamReader(inStream));
-                String temp, response = "";
-                while ((temp = bReader.readLine()) != null) {
-                    response += temp;
+                String urlString = "https://maps.googleapis.com/maps/api/directions/json?waypoints=optimize:true" + routeString + "&key=AIzaSyBXFjiBzV08gMKJ7ZfNcF5es-CgoAu7slQ&origin=" + orig + "&destination=" + orig;
+                HttpURLConnection urlConnection = null;
+                URL url = null;
+                JSONObject object = null;
+                InputStream inStream = null;
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                try {
+                    InetAddress i = InetAddress.getByName("maps.googleapis.com");
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                    return false;
                 }
-                object = (JSONObject) new JSONTokener(response).nextValue();
-            } catch (Exception e) {
-                Log.d("UGH", e.toString());
-                Log.d("UGH",e.getLocalizedMessage());
-                Log.d("UGH",e.getMessage());
-                Toast.makeText(context.getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
-            } finally {
-                if (inStream != null) {
-                    try {
-                        // this will close the bReader as well
-                        inStream.close();
-                    } catch (IOException ignored) {
+                try {
+                    url = new URL(urlString);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setDoOutput(true);
+                    urlConnection.setDoInput(true);
+                    urlConnection.connect();
+                    inStream = urlConnection.getInputStream();
+                    BufferedReader bReader = new BufferedReader(new InputStreamReader(inStream));
+                    String temp, response = "";
+                    while ((temp = bReader.readLine()) != null) {
+                        response += temp;
                     }
-                }
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
+                    object = (JSONObject) new JSONTokener(response).nextValue();
+                } catch (Exception e) {
+                    Log.d("UGH", e.toString());
+                    Log.d("UGH",e.getLocalizedMessage());
+                    Log.d("UGH", e.getMessage());
+                    // Toast.makeText(context.getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                } finally {
+                    if (inStream != null) {
+                        try {
+                            // this will close the bReader as well
+                            inStream.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
+                    if (urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
             }
             try {
                 JSONArray waypointOrder = object.getJSONArray("routes").getJSONObject(0).getJSONArray("waypoint_order");
@@ -121,7 +115,7 @@ public class Route {
                 for(int i=0;i<legs.length();i++) {
                     locations.add(legs.getJSONObject(i).getJSONObject("start_location"));
                 }
-                Toast.makeText(context,waypointOrder.toString(),Toast.LENGTH_LONG).show();
+                // Toast.makeText(context,waypointOrder.toString(),Toast.LENGTH_LONG).show();
 
                 namesOrdered = new ArrayList<>();
                 for(int i=0;i<list.size();i++) {
@@ -133,6 +127,10 @@ public class Route {
                     ordered.add(l.getDouble("lat") + "," + l.getDouble("lng"));
                 }
                 polyline = object.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+                JSONObject obounds = object.getJSONArray("routes").getJSONObject(0).getJSONObject("bounds");
+                JSONObject ne = obounds.getJSONObject("northeast");
+                JSONObject sw = obounds.getJSONObject("southwest");
+                bounds = ne.getString("lat") + "," + ne.getString("lng") + ";" + sw.getString("lat") + "," + sw.getString("lng");
                 return ordered != null;
             }
             catch(Exception e) {

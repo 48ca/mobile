@@ -5,7 +5,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="me.jhoughton.multidrop.DirectionsActivity">
-        <TextView
+        <!--TextView
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:text="Directions"
@@ -14,9 +14,9 @@
             android:id="@+id/directions"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            />
+            /-->
 
-    <Button
+    <!--Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Done"
@@ -24,7 +24,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginRight="25dp"
-        />
+        /-->
 
     <Button
         android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
         android:id="@+id/plotButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="25dp"
+        android:layout_marginLeft="75dp"
         />
 
     <Button
@@ -42,15 +42,19 @@
         android:text="Order"
         android:id="@+id/order"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="75dp"/>
+        <!--
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        />
+        -->
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/directionsText"
         android:hint="Address"
-        android:layout_above="@+id/doneButton"
+        android:layout_above="@+id/plotButton"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@+id/addButton" />
 

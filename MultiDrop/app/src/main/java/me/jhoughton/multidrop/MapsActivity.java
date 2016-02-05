@@ -37,53 +37,12 @@ import com.google.android.gms.maps.model.internal.IPolylineDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-class MapsGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-    private static final int SWIPE_MIN_DISTANCE = 50;
-    private static final int SWIPE_MAX_OFF_PATH = 200;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-    private MapsActivity context;
-    public MapsGestureListener(MapsActivity c) {
-        context = c;
-    }
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                           float velocityY) {
-        try {
-            Toast t = Toast.makeText(context, "Gesture detected", Toast.LENGTH_SHORT);
-            t.show();
-            float diffAbs = Math.abs(e1.getY() - e2.getY());
-            float diff = e1.getX() - e2.getX();
-
-            if (diffAbs > SWIPE_MAX_OFF_PATH)
-                return false;
-
-            // Left swipe
-            if (diff > SWIPE_MIN_DISTANCE
-                    && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                context.bringUpPane();
-            }
-        } catch (Exception e) {
-            Log.e("Home", "Error on gestures");
-        }
-        return false;
-    }
-    @Override
-    public boolean onContextClick(MotionEvent event) {
-        context.bringUpPane();
-        return false;
-    }
-}
-*/
-
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationManager locMgr;
     static int GPS_ALLOWED = 0;
     LatLng currentLoc;
-    boolean transitionUp = true;
     PolylineOptions poly;
     public boolean justStarted;
 
@@ -99,33 +58,32 @@ public class MapsActivity extends FragmentActivity {
             String l = locations.get(i);
             double lat = Double.parseDouble(l.substring(0,l.indexOf(',')));
             double lon = Double.parseDouble(l.substring(l.indexOf(',') + 1));
-            Toast.makeText(getApplicationContext(),l,Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getApplicationContext(),l,Toast.LENGTH_SHORT).show();
             mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)));
         }
         if(getIntent().getStringExtra("polyline") == null) return;
         poly = new PolylineOptions();
         for(LatLng l : decodePoly(getIntent().getStringExtra("polyline"))) {
-            Log.d("UGH","LAT: " + l.latitude + " LON: " + l.longitude);
+            // Log.d("UGH","LAT: " + l.latitude + " LON: " + l.longitude);
             poly.add(l);
         }
-        poly.width(5).color(Color.RED);
-        Toast.makeText(getApplicationContext(), poly.toString(), Toast.LENGTH_LONG).show();
+        poly.width(20).color(Color.RED);
+        // Toast.makeText(getApplicationContext(), poly.toString(), Toast.LENGTH_LONG).show();
+        if(getIntent().getStringExtra("bounds") == null) return;
+        String bounds = getIntent().getStringExtra("bounds");
+        String nes = bounds.substring(0, bounds.indexOf(';'));
+        String sws = bounds.substring(bounds.indexOf(';') + 1);
+        int swd = sws.indexOf(',');
+        int ned = nes.indexOf(',');
+        LatLng sw = new LatLng(Double.parseDouble(sws.substring(0,swd)), Double.parseDouble(sws.substring(swd+1)));
+        LatLng ne = new LatLng(Double.parseDouble(nes.substring(0,ned)), Double.parseDouble(nes.substring(ned+1)));
         mMap.addPolyline(poly);
-        // zoomOnCoords() to zoom
-        // final GestureDetector.SimpleOnGestureListener gestureDetector = new MapsGestureListener(this);
-        /*
-        rl.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(transitionUp)
-                    bringUpPane(rl, findViewById(R.id.map).getHeight());
-                else
-                    bringDownPane(rl, findViewById(R.id.map).getHeight());
-                transitionUp = !transitionUp;
-                return false;
-            }
-        });
-        */
+        // Toast.makeText(getApplicationContext(),"SW: " + sw.toString(),Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getApplicationContext(),"NE: " + ne.toString(),Toast.LENGTH_SHORT).show();
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(sw,ne), width, height, 50));
+        // mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(zoomOnCoords(locations), 50));
     }
 
     private ArrayList<LatLng> decodePoly(String encoded) {
@@ -215,8 +173,8 @@ public class MapsActivity extends FragmentActivity {
             i.putExtra("location", locationArray);
             if(currentLoc == null) {
                 if (mMap != null) {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
                     if(justStarted) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
                         final RelativeLayout rl = (RelativeLayout) findViewById(R.id.bottomPane);
                         rl.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -257,25 +215,24 @@ public class MapsActivity extends FragmentActivity {
         }
     };
 
-    private void zoomOnCoords() {
-        Intent i = getIntent();
-        ArrayList<CharSequence> al = i.getCharSequenceArrayListExtra("locations");
+    private LatLngBounds zoomOnCoords(ArrayList<String> al) {
+        // Intent i = getIntent();
         double lat, lon;
         int in;
-        String str;
+        // String str;
         LatLngBounds bounds = null;
-        for(CharSequence cs: al) {
-            str = cs.toString();
-            in = str.indexOf(',');
-            lat = Double.parseDouble(str.substring(0, in));
-            lon = Double.parseDouble(str.substring(in + 1));
+        for(String cs: al) {
+            Toast.makeText(getApplicationContext(),cs,Toast.LENGTH_SHORT).show();
+            // str = cs.toString();
+            in = cs.indexOf(',');
+            lat = Double.parseDouble(cs.substring(0, in));
+            lon = Double.parseDouble(cs.substring(in + 1));
             LatLng loc = new LatLng(lat,lon);
             bounds = bounds == null ? new LatLngBounds(loc,loc): bounds.including(loc);
             // Toast.makeText(getApplicationContext(),lat+" "+lon,Toast.LENGTH_SHORT).show();
-            mMap.addMarker(new MarkerOptions().position(loc));
+            // mMap.addMarker(new MarkerOptions().position(loc));
         }
-        if(bounds != null)
-            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,50));
+        return bounds;
         // mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng((maxlat + minlat) / 2.0, (minlon + maxlon) / 2.0)));
     }
 
